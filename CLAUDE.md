@@ -6,7 +6,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 An R API client for Jev, TypeSafe's classification model (a "System One" model: it returns typed answers with probabilities, not generated text). TypeSafe publishes Python and JavaScript SDKs only, so this client is built directly against the HTTP API.
 
-The repository currently holds `jev-docs/`, `.env`, and `.gitignore`. No R code, package skeleton, tests, or lint configuration exists yet. When they are added, record the build, test, and single-test commands here.
+The repository root is the R package `coal`. Its user-facing function is `jev()`, which is vectorized over `state` and returns a tibble with one row per state. `jev_request()`, `jev_perform()`, and `jev_parse()` are the three stages `jev()` composes, and they stay public so callers can reach the unparsed JSON and the `httr2` responses. There is no lint configuration; `lintr` is not installed.
+
+## Build, test, check
+
+Run these from the repository root.
+
+```r
+devtools::load_all()                            # attach without installing
+devtools::document()                            # after changing roxygen comments
+devtools::test()                                # mocked tests; no key or network needed
+devtools::test(filter = 'parse')                # one test file
+devtools::check(document = FALSE, args = '--no-manual')
+```
+
+`devtools::check()` reports one NOTE, "unable to verify current time", because the sandbox has no network. Everything else should be clean.
+
+The live tests in `tests/testthat/test-live.R` make real API calls and are skipped unless `TYPESAFE_API_KEY` is set. The R REPL MCP is sandboxed from the network, so run them through `Rscript`:
+
+```bash
+Rscript -e "readRenviron('.env'); devtools::load_all(); testthat::test_file('tests/testthat/test-live.R')"
+```
+
+## Testing constraints
+
+- `httr2::local_mocked_responses()` returns a mocked response before `req_perform()` reaches its retry loop, so retries cannot be exercised end to end. `tests/testthat/test-retry.R` tests the policy attached to the request and each policy function on its own instead.
+- `httr2::req_dry_run()` fails in this environment with an Rcpp error. To inspect a serialized body, use the `request_json()` helper in `tests/testthat/helper-mock.R`, which applies `req$body$params` to `req$body$data` the way httr2 does at send time.
+- `req_perform_parallel()` does not enforce `req_retry(max_tries)`. Tests that depend on the exact try count pass `max_active = 1`.
 
 ## Documentation
 

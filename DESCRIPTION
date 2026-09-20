@@ -1,0 +1,26 @@
+Package: coal
+Title: R Client for the Jev Classification API
+Version: 0.0.0.9000
+Authors@R:
+    person('Dan', 'Hicks', email = 'hicks.daniel.j@gmail.com', role = c('aut', 'cre'))
+Description: A thin functional client for TypeSafe's Jev API, which evaluates a
+    text state against typed questions and returns probabilities and confidence
+    rather than generated text. Argument names mirror the HTTP fields. The main
+    function is vectorized over states and returns a data frame with one row per
+    state, so answers can be spliced onto a data frame inside a pipeline.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports:
+    cli,
+    httr2 (>= 1.0.0),
+    rlang,
+    tibble,
+    vctrs
+Suggests:
+    dplyr,
+    jsonlite,
+    testthat (>= 3.0.0),
+    withr
+Config/testthat/edition: 3

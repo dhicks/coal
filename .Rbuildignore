@@ -1,0 +1,8 @@
+^\.env$
+^\.claude$
+^CLAUDE\.md$
+^TODO\.md$
+^jev-docs$
+^\.Rproj\.user$
+^.*\.Rproj$
+^\.github$
